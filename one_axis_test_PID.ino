@@ -10,18 +10,28 @@ Servo servo2;
 
 int servoPin1= 9;
 int servoPin2=10;
-int pA;
-int iA;
-int dA;
-int pG;
-int iG;
-int dG;
-int input;
-int inputservo;
+int pA2;
+int iA2;
+int dA2;
+int pG2;
+int iG2;
+int dG2;
+int pA1;
+int iA1;
+int dA1;
+int pG1;
+int iG1;
+int dG1;
+int input1;
+int input2;
+int inputservo1;
+int inputservo2;
 
 float elapsedTime, currentTime, previousTime;
-float kpA=.5;
-float kpG=.5;
+float kpA1=.5;
+float kpA2=.5;
+float kpG1=.5;
+float kpG2=.5;
 //float ki=1;
 //float kd=0;
 
@@ -35,7 +45,7 @@ void setup() {
   sensor2.init();
 
   servo1.attach(servoPin1);
-  //servo2.attach(servoPin2);
+  servo2.attach(servoPin2);
 }
 void loop() {
   sensor2.getGres();
@@ -50,13 +60,13 @@ void loop() {
   
    // Print out the data
   // Gyroscope
- Serial.print("Gyroscope ");
- Serial.print("X: ");
- Serial.print((int)sensor2.gyroData.x);
- Serial.print(" Y: ");
- Serial.print((int)sensor2.gyroData.y);
- Serial.print(" Z: ");
- Serial.println((int)sensor2.gyroData.z);
+  Serial.print("Gyroscope ");
+  Serial.print("X: ");
+  Serial.print((int)sensor2.gyroData.x);
+  Serial.print(" Y: ");
+  Serial.print((int)sensor2.gyroData.y);
+  Serial.print(" Z: ");
+  Serial.println((int)sensor2.gyroData.z);
   // Accelerometer
   Serial.print("Accel ");
   Serial.print("X: ");
@@ -67,18 +77,23 @@ void loop() {
   Serial.println((int)sensor.accelData.z);
 
  //PID 
- pA= sensor.accelData.y*kpA;
- pG=sensor2.gyroData.x*kpG;
+ pA1= sensor.accelData.y*kpA1;
+ pG1=sensor2.gyroData.x*kpG1;
+ pA2= sensor.accelData.x*kpA2;
+ pG2=sensor2.gyroData.y*kpG2;
  //iA= (sensor.accelData.y/elapsedTime)*kiA;
-input=pG+pA;
+ input1=pG1+pA1;
+ input2=pG2+pA2;
 
 
-inputservo = map ((input), -2000, 2000, 170, 30) ; //scales the accel value to a value for the servo position 
+inputservo1 = map ((input1), -2000, 2000, 170, 30); //scales the accel value to a value for the servo position 
+inputservo2= map ((input2), -2000,2000, 170, 10);
 Serial.print("PIDoutput: ");
-Serial.println (input); 
-servo1.write (inputservo); 
+Serial.println (input1); 
+servo1.write (inputservo1); 
+servo2.write (inputservo2);
 Serial.print("ServoPID: ");
-Serial.println(inputservo);
+Serial.println(inputservo1);
 delay (.001);
 
 }
