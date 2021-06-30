@@ -28,10 +28,10 @@ int inputservo1;
 int inputservo2;
 
 float elapsedTime, currentTime, previousTime;
-float kpA1=.5;
-float kpA2=.5;
-float kpG1=.5;
-float kpG2=.5;
+float kpA1=.4;
+float kpA2=.4;
+float kpG1=.6;
+float kpG2=.6;
 //float ki=1;
 //float kd=0;
 
@@ -87,13 +87,13 @@ void loop() {
 
 
 inputservo1 = map ((input1), -2000, 2000, 170, 30); //scales the accel value to a value for the servo position 
-inputservo2= map ((input2), -2000,2000, 170, 10);
+inputservo2= map ((input2), -2000,2000, 150, 10);
 Serial.print("PIDoutput: ");
 Serial.println (input1); 
 servo1.write (inputservo1); 
 servo2.write (inputservo2);
 Serial.print("ServoPID: ");
 Serial.println(inputservo1);
-delay (.001);
+//delay (.001);
 
 }
