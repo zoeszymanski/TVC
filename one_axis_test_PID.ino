@@ -71,7 +71,7 @@ void loop() {
  pG=sensor2.gyroData.x*kpG;
  //iA= (sensor.accelData.y/elapsedTime)*kiA;
 input=pG+pA;
-//+i;
+
 
 inputservo = map ((input), -2000, 2000, 170, 30) ; //scales the accel value to a value for the servo position 
 Serial.print("PIDoutput: ");
