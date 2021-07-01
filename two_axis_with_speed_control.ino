@@ -9,34 +9,39 @@ Servo servo1;
 Servo servo2;
 Servo ESC; 
 
-int fanspeed=0;
+
+
 int servoPin1= 9;
 int servoPin2=10;
 int ESCPin=8;
 int pA2;
-int iA2;
-int dA2;
 int pG2;
-int iG2;
-int dG2;
 int pA1;
-int iA1;
-int dA1;
 int pG1;
-int iG1;
-int dG1;
 int input1;
 int input2;
 int inputservo1;
 int inputservo2;
+int arraysize= 20;
+int gyrox[20];
+int gyroy[20];
+int accelx[20];
+int accely[20];
+int TopValues[4];
+int index=0;
+int gyrox_max=0;
+int gyroy_max=0;
+int accelx_max=0;
+int accely_max=0;
+int constant=0;
+
 
 float elapsedTime, currentTime, previousTime;
 float kpA1=.4;
 float kpA2=.4;
 float kpG1=.6;
 float kpG2=.6;
-//float ki=1;
-//float kd=0;
+
 
 void setup() {
   Serial.begin(9600);
@@ -50,63 +55,102 @@ void setup() {
   servo1.attach(servoPin1);
   servo2.attach(servoPin2);
   ESC.attach(8,1000,2000);
+
+ 
 }
+
 void loop() {
   sensor2.getGres();
   sensor.readAccelData();
   sensor2.readGyroData();
+  
 
-  ESC.writeMicroseconds(1000);
-  delay(50);
-  ESC.writeMicroseconds(2000);
   
-  previousTime=currentTime;
-  currentTime= millis();
-  elapsedTime=(currentTime - previousTime)/1000;
-
-  if(elapsedTime<= 4){
-    ESC.writeMicroseconds(1500);
-  }else if (elapsedTime>7){
-    ESC.writeMicroseconds(1000); 
-  }
-  
-  
-   // Print out the data
   // Gyroscope
   Serial.print("Gyroscope ");
   Serial.print("X: ");
   Serial.print((int)sensor2.gyroData.x);
   Serial.print(" Y: ");
-  Serial.print((int)sensor2.gyroData.y);
-  Serial.print(" Z: ");
-  Serial.println((int)sensor2.gyroData.z);
-  // Accelerometer
-  Serial.print("Accel ");
-  Serial.print("X: ");
+  Serial.println((int)sensor2.gyroData.y);
+  //Serial.print(" Z: ");
+  //Serial.println((int)sensor2.gyroData.z);
+  // Accelerometer           
+  Serial.print("Accel ");   
   Serial.print((int)sensor.accelData.x);
   Serial.print(" Y: ");
-  Serial.print((int)sensor.accelData.y);
-  Serial.print(" Z: ");
-  Serial.println((int)sensor.accelData.z);
+  Serial.println((int)sensor.accelData.y);
+  //Serial.print(" Z: ");
+  //Serial.println((int)sensor.accelData.z);
 
- //PID 
- pA1= sensor.accelData.y*kpA1;
+  while(constant=0) {
+  gyrox[index]=(sensor2.gyroData.x);
+  index=index+1;
+    if(index>(arraysize-1)); {
+      index=0;
+    }
+  }
+    for (int i=0; i<20; i++) {
+    if (gyrox[i] > gyrox_max){
+     gyrox_max=gyrox[i];
+     Serial.print(gyrox_max);
+    }
+  }
+  while(constant=0) {
+  gyroy[index]=(sensor2.gyroData.y);
+  index=index+1;
+    if(index>(arraysize-1)); {
+      index=0;
+    }
+  }
+     for (int i=0; i<20; i++) {
+    if (gyroy[i] > gyroy_max){
+     gyroy_max=gyroy[i];
+    }
+     }
+  while(constant=0) {
+  accelx[index]=(sensor.accelData.x);
+  index=index+1;
+    if(index>(arraysize-1)); {
+      index=0;
+    }
+  }
+     for (int i=0; i<20; i++) {
+    if (accelx[i] > accelx_max){
+     accelx_max=accelx[i];
+    }
+     }
+  while(constant=0) {
+  accely[index]=(sensor.accelData.x);
+  index=index+1;
+    if(index>(arraysize-1)); {
+      index=0;
+    }
+  }
+     for (int i=0; i<20; i++) {
+    if (accely[i] > accely_max){
+     accely_max=accely[i];
+    }
+  }
+ 
+ if ( abs(accely_max)<500 && abs(accelx_max)<500 && abs(gyroy_max)<500 && abs(gyrox_max)<500 ){
+ ESC.writeMicroseconds(1000);
+ Serial.println("1");
+ servo1.write(90);
+ servo2.write(90);}
+
+
+ else; {ESC.writeMicroseconds(2000);
+  Serial.println("5");
+   pA1= sensor.accelData.y*kpA1;
  pG1=sensor2.gyroData.x*kpG1;
+ input1=pG1+pA1;
+ inputservo1 = map ((input1), -2000, 2000, 170, 30);
+ servo1.write (inputservo1); 
+
  pA2= sensor.accelData.x*kpA2;
  pG2=sensor2.gyroData.y*kpG2;
- //iA= (sensor.accelData.y/elapsedTime)*kiA;
- input1=pG1+pA1;
  input2=pG2+pA2;
-
-
-inputservo1 = map ((input1), -2000, 2000, 170, 30); //scales the accel value to a value for the servo position 
-inputservo2= map ((input2), -2000,2000, 150, 10);
-Serial.print("PIDoutput: ");
-Serial.println (input1); 
-servo1.write (inputservo1); 
-servo2.write (inputservo2);
-Serial.print("ServoPID: ");
-Serial.println(inputservo1);
-//delay (.001);
-
+ inputservo2= map ((input2), -2000,2000, 150, 10);
+ servo2.write (inputservo2);}
+ 
 }
