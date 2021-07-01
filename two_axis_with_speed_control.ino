@@ -13,7 +13,7 @@ Servo ESC;
 
 int servoPin1= 9;
 int servoPin2=10;
-int ESCPin=8;
+int ESCPin=11;
 int pA2;
 int pG2;
 int pA1;
@@ -29,18 +29,18 @@ int accelx[20];
 int accely[20];
 int TopValues[4];
 int index=0;
-int gyrox_max=0;
-int gyroy_max=0;
-int accelx_max=0;
-int accely_max=0;
+int gyrox_max;
+int gyroy_max;
+int accelx_max;
+int accely_max;
 int constant=0;
 
 
 float elapsedTime, currentTime, previousTime;
-float kpA1=.4;
-float kpA2=.4;
-float kpG1=.6;
-float kpG2=.6;
+float kpA1=.5;
+float kpA2=.5;
+float kpG1=.5;
+float kpG2=.5;
 
 
 void setup() {
@@ -54,7 +54,7 @@ void setup() {
 
   servo1.attach(servoPin1);
   servo2.attach(servoPin2);
-  ESC.attach(8,1000,2000);
+  ESC.attach(ESCPin,1000,2000);
 
  
 }
@@ -82,64 +82,37 @@ void loop() {
   //Serial.print(" Z: ");
   //Serial.println((int)sensor.accelData.z);
 
-  while(constant=0) {
+  
   gyrox[index]=(sensor2.gyroData.x);
-  index=index+1;
-    if(index>(arraysize-1)); {
-      index=0;
-    }
-  }
-    for (int i=0; i<20; i++) {
-    if (gyrox[i] > gyrox_max){
-     gyrox_max=gyrox[i];
-     Serial.print(gyrox_max);
-    }
-  }
-  while(constant=0) {
   gyroy[index]=(sensor2.gyroData.y);
-  index=index+1;
-    if(index>(arraysize-1)); {
-      index=0;
-    }
-  }
-     for (int i=0; i<20; i++) {
-    if (gyroy[i] > gyroy_max){
-     gyroy_max=gyroy[i];
-    }
-     }
-  while(constant=0) {
   accelx[index]=(sensor.accelData.x);
-  index=index+1;
-    if(index>(arraysize-1)); {
-      index=0;
-    }
+  accely[index]=(sensor.accelData.y);
+  
+    
+    gyrox_max=0;
+    gyroy_max=0;
+    accelx_max=0;
+    accely_max=0;
+    
+    for (int i=0; i<20; i++) {
+    if (abs(gyrox[i]) > gyrox_max){gyrox_max=abs(gyrox[i]);}
+    if (abs(gyroy[i]) > gyroy_max){gyroy_max=abs(gyroy[i]);}
+    if (abs(accelx[i]) > accelx_max){accelx_max=abs(accelx[i]);}
+    if (abs(accely[i]) > accely_max){accely_max=abs(accely[i]);}
   }
-     for (int i=0; i<20; i++) {
-    if (accelx[i] > accelx_max){
-     accelx_max=accelx[i];
-    }
-     }
-  while(constant=0) {
-  accely[index]=(sensor.accelData.x);
-  index=index+1;
-    if(index>(arraysize-1)); {
-      index=0;
-    }
-  }
-     for (int i=0; i<20; i++) {
-    if (accely[i] > accely_max){
-     accely_max=accely[i];
-    }
-  }
- 
- if ( abs(accely_max)<500 && abs(accelx_max)<500 && abs(gyroy_max)<500 && abs(gyrox_max)<500 ){
- ESC.writeMicroseconds(1000);
+ Serial.println(gyrox_max );
+ Serial.println(gyroy_max );
+ Serial.println(accelx_max  );
+ Serial.println(accely_max  );
+
+  
+//servo
+ if ( abs(accely_max)<700 && abs(accelx_max)<700 && abs(gyroy_max)<700 && abs(gyrox_max)<700 ){
  Serial.println("1");
  servo1.write(90);
- servo2.write(90);}
-
-
- else; {ESC.writeMicroseconds(2000);
+ servo2.write(90);
+ }
+ else if ( abs(accely_max)>=700 || abs(accelx_max)>=700 || abs(gyroy_max)>=700 || abs(gyrox_max)>=700 ){
   Serial.println("5");
    pA1= sensor.accelData.y*kpA1;
  pG1=sensor2.gyroData.x*kpG1;
@@ -152,5 +125,29 @@ void loop() {
  input2=pG2+pA2;
  inputservo2= map ((input2), -2000,2000, 150, 10);
  servo2.write (inputservo2);}
+
+//esc control
+ if ( abs(accely_max)>=500 || abs(accelx_max)>=500 || abs(gyroy_max)>=10000 || abs(gyrox_max)>=10000 ){
+  ESC.writeMicroseconds(1500);
+ }
+ else if ( abs(accely_max)>=500 || abs(accelx_max)>=500 || (abs(gyroy_max) < 10000 && abs(gyroy_max)>=5000) || (abs(gyrox_max) < 10000 && abs(gyrox_max)>=5000) ){
+  ESC.writeMicroseconds(1400);
+ }
  
+ else if ( abs(accely_max)>=500 || abs(accelx_max)>=500 || (abs(gyroy_max) < 5000 && abs(gyroy_max)>=2500) || (abs(gyrox_max) < 5000 && abs(gyrox_max)>=2500) ){
+  ESC.writeMicroseconds(1250);
+ }
+ else if ( abs(accely_max)>=700 || abs(accelx_max)>=700 || (abs(gyroy_max) < 2500 && abs(gyroy_max)>=700) || (abs(gyrox_max) < 2500 && abs(gyrox_max)>=700) ){
+  ESC.writeMicroseconds(500);
+ }
+ else
+  //( abs(accely_max)<700 && abs(accelx_max)<700 && abs(gyroy_max)<700 && abs(gyrox_max)<700 );{
+ {ESC.writeMicroseconds(250);
+ }
+//circular buffer index increment 
+      index=index+1;
+   if(index>(arraysize-1)); {
+   index=0;
+   }
+
 }
