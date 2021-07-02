@@ -10,7 +10,6 @@ Servo servo2;
 Servo ESC; 
 
 
-
 int servoPin1= 9;
 int servoPin2=10;
 int ESCPin=11;
@@ -27,7 +26,6 @@ int gyrox[20];
 int gyroy[20];
 int accelx[20];
 int accely[20];
-int TopValues[4];
 int index=0;
 int gyrox_max;
 int gyroy_max;
@@ -100,50 +98,55 @@ void loop() {
     if (abs(accelx[i]) > accelx_max){accelx_max=abs(accelx[i]);}
     if (abs(accely[i]) > accely_max){accely_max=abs(accely[i]);}
   }
- Serial.println(gyrox_max );
- Serial.println(gyroy_max );
- Serial.println(accelx_max  );
- Serial.println(accely_max  );
+ //Serial.println(gyrox_max );
+// Serial.println(gyroy_max );
+// Serial.println(accelx_max  );
+// Serial.println(accely_max  );
 
   
 //servo
- if ( abs(accely_max)<700 && abs(accelx_max)<700 && abs(gyroy_max)<700 && abs(gyrox_max)<700 ){
- Serial.println("1");
+ if ( abs(accely_max)<700 && abs(accelx_max)<700 && abs(gyroy_max)<1000 && abs(gyrox_max)<1000 ){
+ //Serial.println("1");
  servo1.write(90);
  servo2.write(90);
  }
- else if ( abs(accely_max)>=700 || abs(accelx_max)>=700 || abs(gyroy_max)>=700 || abs(gyrox_max)>=700 ){
-  Serial.println("5");
+ else if ( abs(accely_max)>=700 || abs(accelx_max)>=700 || abs(gyroy_max)>=1000 || abs(gyrox_max)>=1000 ){
+  //Serial.println("5");
    pA1= sensor.accelData.y*kpA1;
  pG1=sensor2.gyroData.x*kpG1;
  input1=pG1+pA1;
- inputservo1 = map ((input1), -2000, 2000, 170, 30);
+ inputservo1 = map ((input1), -2000, 2000, 170, 20);
  servo1.write (inputservo1); 
 
  pA2= sensor.accelData.x*kpA2;
  pG2=sensor2.gyroData.y*kpG2;
  input2=pG2+pA2;
- inputservo2= map ((input2), -2000,2000, 150, 10);
+ inputservo2= map ((input2), -2000,2000, 130, 10);
  servo2.write (inputservo2);}
 
 //esc control
  if ( abs(accely_max)>=500 || abs(accelx_max)>=500 || abs(gyroy_max)>=10000 || abs(gyrox_max)>=10000 ){
-  ESC.writeMicroseconds(1500);
+  ESC.writeMicroseconds(1200);
+  Serial.println("Speed 5");
  }
  else if ( abs(accely_max)>=500 || abs(accelx_max)>=500 || (abs(gyroy_max) < 10000 && abs(gyroy_max)>=5000) || (abs(gyrox_max) < 10000 && abs(gyrox_max)>=5000) ){
-  ESC.writeMicroseconds(1400);
+  ESC.writeMicroseconds(1200);
+  Serial.println("Speed 4");
  }
  
  else if ( abs(accely_max)>=500 || abs(accelx_max)>=500 || (abs(gyroy_max) < 5000 && abs(gyroy_max)>=2500) || (abs(gyrox_max) < 5000 && abs(gyrox_max)>=2500) ){
-  ESC.writeMicroseconds(1250);
+  ESC.writeMicroseconds(1150);
+  Serial.println("Speed 3");
  }
  else if ( abs(accely_max)>=700 || abs(accelx_max)>=700 || (abs(gyroy_max) < 2500 && abs(gyroy_max)>=700) || (abs(gyrox_max) < 2500 && abs(gyrox_max)>=700) ){
-  ESC.writeMicroseconds(500);
+  ESC.writeMicroseconds(1050);
+  Serial.println("Speed 2");
  }
- else
-  //( abs(accely_max)<700 && abs(accelx_max)<700 && abs(gyroy_max)<700 && abs(gyrox_max)<700 );{
- {ESC.writeMicroseconds(250);
+ else if ( abs(accely_max)<700 && abs(accelx_max)<700 && abs(gyroy_max)<1000 && abs(gyrox_max)<1000 ){
+ ESC.writeMicroseconds(1000);
+ Serial.println("Speed 1");
  }
+ 
 //circular buffer index increment 
       index=index+1;
    if(index>(arraysize-1)); {
