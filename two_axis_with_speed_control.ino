@@ -35,10 +35,10 @@ int constant=0;
 
 
 float elapsedTime, currentTime, previousTime;
-float kpA1=.5;
-float kpA2=.5;
-float kpG1=.5;
-float kpG2=.5;
+float kpA1=.9;
+float kpA2=.9;
+float kpG1=.9;
+float kpG2=.9;
 
 
 void setup() {
@@ -114,27 +114,31 @@ void loop() {
   //Serial.println("5");
    pA1= sensor.accelData.y*kpA1;
  pG1=sensor2.gyroData.x*kpG1;
+ pA1=pA1*.5;
+ pG1=pG1*.5;
  input1=pG1+pA1;
  inputservo1 = map ((input1), -2000, 2000, 170, 20);
  servo1.write (inputservo1); 
 
  pA2= sensor.accelData.x*kpA2;
  pG2=sensor2.gyroData.y*kpG2;
+ pA2=pA2*.5;
+ pG2=pG2*.5;
  input2=pG2+pA2;
  inputservo2= map ((input2), -2000,2000, 130, 10);
  servo2.write (inputservo2);}
 
 //esc control
- if ( abs(accely_max)>=500 || abs(accelx_max)>=500 || abs(gyroy_max)>=10000 || abs(gyrox_max)>=10000 ){
-  ESC.writeMicroseconds(1200);
+ if ( abs(accely_max)>=700 || abs(accelx_max)>=700 || abs(gyroy_max)>=10000 || abs(gyrox_max)>=10000 ){
+  ESC.writeMicroseconds(1300);
   Serial.println("Speed 5");
  }
- else if ( abs(accely_max)>=500 || abs(accelx_max)>=500 || (abs(gyroy_max) < 10000 && abs(gyroy_max)>=5000) || (abs(gyrox_max) < 10000 && abs(gyrox_max)>=5000) ){
+ else if ( abs(accely_max)>=700 || abs(accelx_max)>=700 || (abs(gyroy_max) < 10000 && abs(gyroy_max)>=5000) || (abs(gyrox_max) < 10000 && abs(gyrox_max)>=5000) ){
   ESC.writeMicroseconds(1200);
   Serial.println("Speed 4");
  }
  
- else if ( abs(accely_max)>=500 || abs(accelx_max)>=500 || (abs(gyroy_max) < 5000 && abs(gyroy_max)>=2500) || (abs(gyrox_max) < 5000 && abs(gyrox_max)>=2500) ){
+ else if ( abs(accely_max)>=700 || abs(accelx_max)>=700 || (abs(gyroy_max) < 5000 && abs(gyroy_max)>=2500) || (abs(gyrox_max) < 5000 && abs(gyrox_max)>=2500) ){
   ESC.writeMicroseconds(1150);
   Serial.println("Speed 3");
  }
