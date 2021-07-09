@@ -31,10 +31,7 @@ int gyrox_max;
 int gyroy_max;
 int accelx_max;
 int accely_max;
-int constant=0;
 
-
-float elapsedTime, currentTime, previousTime;
 float kpA1=1;
 float kpA2=1;
 float kpG1=1;
